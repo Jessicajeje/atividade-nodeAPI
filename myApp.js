@@ -2,7 +2,7 @@ const http = require('http');
 const https = require('https');
 
 http.createServer((req, res) => {
-    const apiUrl = 'https://jsonplaceholder.typicode.com/posts?userId=1';
+    const apiUrl = 'https://dog.ceo/api/breeds/image/random';
 
     https.get(apiUrl, (apiRes) => {
         let data = '';
@@ -11,15 +11,19 @@ http.createServer((req, res) => {
 
         apiRes.on('end', () => {
             try {
-                const posts = JSON.parse(data);
+                const json = JSON.parse(data);
+                const imageUrl = json.message;
+
+                const parts = imageUrl.split('/');
+                const breedIndex = parts.indexOf('breeds') + 1;
+                const breed = parts[breedIndex] || 'Desconhecida';
 
                 res.writeHead(200, {'Content-Type': 'text/html'});
-                res.write('<h1>Posts do Usuário 1</h1>');
+                res.write('<h1>Cachorro Aleatório - Dog API</h1>');
 
-                posts.forEach(post => {
-                    res.write(`<h2>${post.title}</h2>`);
-                    res.write(`<p>${post.body}</p>`);
-                });
+                res.write(`<h2>Raça: ${breed}</h2>`);
+
+                res.write(`<img src="${imageUrl}" alt="Cachorro da raça ${breed}" width="300">`);
 
                 res.end();
             } catch (err) {
